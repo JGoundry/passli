@@ -25,18 +25,18 @@ bool InputManager::validateArgs()
     {
         opts_.mode = MODE::LIST;
     }
-    else if ( argc_ < 3 && strcmp( argv_[1], "add" ) == 0 )
+    else if ( argc_ > 2 && strcmp( argv_[1], "add" ) == 0 )
     {
         opts_.mode = MODE::ADD;
         opts_.name = argv_[2];
     }
-    else if ( argc_ < 3 && strcmp( argv_[1], "get" ) == 0 )
+    else if ( argc_ > 2 && strcmp( argv_[1], "get" ) == 0 )
     {
         opts_.mode = MODE::GET;
         opts_.name = argv_[2];
 
     }
-    else if ( argc_ < 3 && strcmp( argv_[1], "del" ) == 0 )
+    else if ( argc_ > 2 && strcmp( argv_[1], "del" ) == 0 )
     {
         opts_.mode = MODE::DEL;
         opts_.name = argv_[2];
