@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ProgramOptions.hpp"
+#include "ProgramTypes.hpp"
 
 #include <string>
 

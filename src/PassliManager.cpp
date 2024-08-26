@@ -98,12 +98,18 @@ bool PassliManager::run()
 
     switch ( opts_.mode )
     {
+        case MODE::LIST:
+            result = vaultManager_.list();
+            break;
         case MODE::ADD:
-            result = vaultManager_.add( opts_.name, opts_.username.value(), opts_.password.value() );
+            result = vaultManager_.add( opts_.name.value(), opts_.username.value(), opts_.password.value() );
+            break;
         case MODE::GET:
-            result = vaultManager_.get( opts_.name );
+            result = vaultManager_.get( opts_.name.value() );
+            break;
         case MODE::DEL:
-            result = vaultManager_.del( opts_.name );
+            result = vaultManager_.del( opts_.name.value() );
+            break;
     }
 
     if ( result && settings_.googleDrive )

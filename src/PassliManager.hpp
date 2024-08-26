@@ -1,16 +1,10 @@
 #pragma once
 
-#include "ProgramOptions.hpp"
+#include "ProgramTypes.hpp"
 #include "InputManager.hpp"
 #include "VaultManager.hpp"
 
 #include <filesystem>
-
-struct ProgramSettings
-{
-    bool googleDrive = false;
-    /* EncryptionType encryptionType = EncryptionType::AES; */
-};
 
 class PassliManager {
 public:

@@ -3,10 +3,8 @@ PROJECT = passli
 
 # Compiler and flags
 CXX = clang++
-CXXFLAGS = -c -Wall -std=c++23 -MMD -MP
-
-# Linker flags
-LFLAGS = -Wall
+CXXFLAGS = -c -Wall -std=c++23 -MMD -MP -I/usr/include
+LFLAGS = -Wall -lgpgme  # Link against the gpgme library
 
 # Directories
 SRC_DIR = src
