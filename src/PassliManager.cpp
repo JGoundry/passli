@@ -99,17 +99,33 @@ bool PassliManager::run()
     switch ( opts_.mode )
     {
         case MODE::LIST:
-            result = vaultManager_.list();
+        {
+            const std::vector< std::string > passwordNames = vaultManager_.list();
+            inputManager_.displayPasswordNames( passwordNames );
+            result = true;
             break;
+        }
         case MODE::ADD:
+        {
             result = vaultManager_.add( opts_.name.value(), opts_.username.value(), opts_.password.value() );
             break;
+        }
         case MODE::GET:
-            result = vaultManager_.get( opts_.name.value() );
+        {
+            const std::optional< std::string > password = vaultManager_.get( opts_.name.value() );
+            if ( password )
+            {
+
+                inputManager_.displayPassword( password.value() );
+                result = true;
+            }
             break;
+        }
         case MODE::DEL:
+        {
             result = vaultManager_.del( opts_.name.value() );
             break;
+        }
     }
 
     if ( result && settings_.googleDrive )

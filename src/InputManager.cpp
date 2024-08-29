@@ -1,5 +1,6 @@
 #include "InputManager.hpp"
 
+#include <algorithm>
 #include <iostream>
 #include <cstring>
 
@@ -80,4 +81,31 @@ std::string InputManager::getInput() const
     std::cout << "> ";
     std::cin >> input;
     return input;
+}
+
+void InputManager::displayHelp() const
+{
+    // todo
+}
+
+void InputManager::displayPassword( const std::string& password ) const
+{
+    std::cout << password << std::endl;
+}
+
+void InputManager::displayPasswordNames( const std::vector< std::string >& passwordNames ) const
+{
+    unsigned long longestName = 0;
+    for ( const std::string& name : passwordNames )
+        longestName = std::max( longestName, name.size() );
+
+
+    std::cout << " " << std::string( longestName + 6, '-' ) << std::endl;
+    for ( const std::string& name : passwordNames )
+    {
+        std::cout << " |--" << std::endl;
+        std::cout << " |- " << name << std::endl;
+    }
+    std::cout << " |--" << std::endl;
+    std::cout << " " << std::string( longestName + 6, '-' ) << std::endl;
 }

@@ -217,39 +217,39 @@ bool encryptDataToFile( const std::string& data, const std::filesystem::path& pa
     return true;
 }
 
-std::string decryptDataFromFile( const std::filesystem::path &path )
+std::optional< std::string > decryptDataFromFile( const std::filesystem::path &path )
 {
     if ( !initGpgme() )
     {
-        return std::string();
+        return std::nullopt;
     }
 
     gpgme_ctx_t ctx = getContext();
     if ( ctx == nullptr )
     {
-        return std::string();
+        return std::nullopt;
     }
 
     if ( !setSymmetricEncrypt( ctx ) )
     {
-        return std::string();
+        return std::nullopt;
     }
     
     gpgme_data_t ciphertext = createDataObject( path );
     if ( ciphertext == nullptr )
     {
-      return std::string();
+      return std::nullopt;
     }
 
     gpgme_data_t plaintext = createEmptyDataObject();
     if ( plaintext == nullptr )
     {
-        return std::string();
+        return std::nullopt;
     }
 
     if ( !decrypt( ctx, ciphertext, plaintext ) )
     {
-        return std::string();
+        return std::nullopt;
     }
     
     gpgme_data_seek( plaintext, 0, SEEK_SET );
