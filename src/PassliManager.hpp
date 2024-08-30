@@ -1,14 +1,15 @@
 #pragma once
 
-#include "ProgramTypes.hpp"
 #include "InputManager.hpp"
+#include "ProgramTypes.hpp"
 #include "VaultManager.hpp"
 
 #include <filesystem>
 
-class PassliManager {
+class PassliManager
+{
 public:
-    PassliManager(int argc, char *argv[]);
+    PassliManager( int argc, char* argv[] );
     bool setup();
     bool run();
 

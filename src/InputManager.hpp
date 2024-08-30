@@ -1,4 +1,5 @@
 #pragma once
+
 #include "ProgramTypes.hpp"
 
 #include <string>
@@ -11,12 +12,14 @@
 class InputManager
 {
 public:
-    InputManager( int argc, char *argv[] );
+    InputManager( int argc, char* argv[] );
     bool validateArgs();
     ProgramOptions getOptions();
-    void displayHelp() const;
-    void displayPassword( const std::string& password ) const;
-    void displayPasswordNames( const std::vector< std::string >& passwordNames ) const;
+    static void displayHelp();
+    static void displayPassword( const std::string& password );
+    static void displayPasswordNames( const std::vector< std::string >& passwordNames );
+    static void printDebug( const std::string& message );
+    static void printError( const std::string& message );
 
 private:
     std::string getUsername();
@@ -24,6 +27,6 @@ private:
     std::string getInput() const;
 
     int argc_;
-    char **argv_;
+    char** argv_;
     ProgramOptions opts_;
 };

@@ -1,7 +1,7 @@
 #pragma once
 
-#include <string>
 #include <filesystem>
+#include <string>
 
 namespace crypt
 {
@@ -10,4 +10,4 @@ bool encryptDataToFile( const std::string& data, const std::filesystem::path& pa
 
 std::optional< std::string > decryptDataFromFile( const std::filesystem::path& path );
 
-}
+} // namespace crypt

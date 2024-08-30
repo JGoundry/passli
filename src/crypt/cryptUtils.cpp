@@ -1,10 +1,12 @@
 #include "cryptUtils.hpp"
+#include "../InputManager.hpp"
 
 #include <gpgme.h>
 
-#include <iostream>
-#include <fstream>
 #include <fcntl.h>
+#include <fstream>
+#include <iostream>
+#include <optional>
 
 namespace crypt
 {
@@ -14,45 +16,47 @@ namespace
 
 bool initGpgme()
 {
-    // Initialise gpgme with default version    
-    gpgme_check_version(NULL);
+    // Initialise gpgme with default version
+    gpgme_check_version( NULL );
 
     // Check opengpg protocol is avaliable
-    gpgme_error_t err = gpgme_engine_check_version(GPGME_PROTOCOL_OPENPGP);
+    gpgme_error_t err = gpgme_engine_check_version( GPGME_PROTOCOL_OPENPGP );
 
     if ( err )
     {
-        std::cerr << "Failed to initialise GPGME: " << gpgme_strerror(err) << std::endl;
+        InputManager::printDebug( std::string( "Failed to initialise GPGME: " ).append( gpgme_strerror( err ) ) );
+
         return false;
     }
+
     return true;
 }
 
 gpgme_ctx_t getContext()
 {
     gpgme_ctx_t ctx;
-    gpgme_error_t err = gpgme_new(&ctx);
+    gpgme_error_t err = gpgme_new( &ctx );
 
     if ( err )
     {
-        std::cerr << "Failed to create GPGME context: " << gpgme_strerror(err) << std::endl;
+        InputManager::printDebug( std::string( "Failed to create GPGME context: " ).append( gpgme_strerror( err ) ) );
         return nullptr;
     }
 
     return ctx;
 }
 
-bool setSymmetricEncrypt(gpgme_ctx_t ctx)
+bool setSymmetricEncrypt( gpgme_ctx_t ctx )
 {
     gpgme_error_t err = gpgme_ctx_set_engine_info( ctx, GPGME_PROTOCOL_OPENPGP, NULL, NULL );
 
     if ( err )
     {
-        std::cerr << "Failed to set symmetric encryption: " << gpgme_strerror(err) << std::endl;
+        InputManager::printDebug( std::string( "Failed to set symmetric encryption: " ).append( gpgme_strerror( err ) ) );
         return false;
     }
 
-    gpgme_set_armor( ctx , 1 );
+    gpgme_set_armor( ctx, 1 );
     return true;
 }
 
@@ -60,13 +64,13 @@ gpgme_data_t createDataObject( const std::string& data )
 {
     gpgme_data_t gpgmeData;
     gpgme_error_t err = gpgme_data_new_from_mem( &gpgmeData, data.c_str(), data.size(), 0 );
-    
+
     if ( err )
     {
-        std::cerr << "Failed to create GPGME data object: " << gpgme_strerror(err) << std::endl;
+        InputManager::printDebug( std::string( "Failed to create GPGME data object: " ).append( gpgme_strerror( err ) ) );
         return nullptr;
     }
-    
+
     return gpgmeData;
 }
 
@@ -74,19 +78,20 @@ gpgme_data_t createDataObject( const std::filesystem::path& path )
 {
     gpgme_data_t gpgmeData;
     FILE* file = fopen( path.string().c_str(), "rb" );
+
     if ( file == nullptr )
     {
-        std::cerr << "Failed to open file: " << path.string() << std::endl;
+        InputManager::printDebug( std::string( "Failed to open file: " ).append( path.string() ) );
         return nullptr;
     }
 
     gpgme_error_t err = gpgme_data_new_from_stream( &gpgmeData, file );
     if ( err )
     {
-        std::cerr << "Failed to create GPGME data object: " << gpgme_strerror(err) << std::endl;
+        InputManager::printDebug( std::string( "Failed to create GPGME data object: " ).append( gpgme_strerror( err ) ) );
         return nullptr;
     }
-    
+
     return gpgmeData;
 }
 
@@ -94,13 +99,13 @@ gpgme_data_t createEmptyDataObject()
 {
     gpgme_data_t gpgmeData;
     gpgme_error_t err = gpgme_data_new( &gpgmeData );
-    
+
     if ( err )
     {
-        std::cerr << "Failed to create GPGME data object: " << gpgme_strerror(err) << std::endl;
+        InputManager::printDebug( std::string( "Failed to create GPGME data object: " ).append( gpgme_strerror( err ) ) );
         return nullptr;
     }
-    
+
     return gpgmeData;
 }
 
@@ -110,7 +115,7 @@ bool encrypt( gpgme_ctx_t ctx, gpgme_data_t plaintext, gpgme_data_t ciphertext )
 
     if ( err )
     {
-        std::cerr << "Failed to encrypt data: " << gpgme_strerror(err) << std::endl;
+        InputManager::printDebug( std::string( "Failed to encrypt data: " ).append( gpgme_strerror( err ) ) );
         return false;
     }
 
@@ -123,7 +128,7 @@ bool decrypt( gpgme_ctx_t ctx, gpgme_data_t ciphertext, gpgme_data_t plaintext )
 
     if ( err )
     {
-        std::cerr << "Failed to decrypt data: " << gpgme_strerror(err) << std::endl;
+        InputManager::printDebug( std::string( "Failed to decrypt data: " ).append( gpgme_strerror( err ) ) );
         return false;
     }
 
@@ -136,33 +141,33 @@ bool writeCiphertextToFile( gpgme_data_t ciphertext, const std::filesystem::path
 
     if ( err )
     {
-        std::cerr << "Failed to seek to beginning of ciphertext: " << gpgme_strerror(err) << std::endl;
+        InputManager::printDebug( std::string( "Failed to seek to beginning of ciphertext: " ).append( gpgme_strerror( err ) ) );
         return false;
     }
 
     std::ofstream file( path );
     if ( !file.is_open() )
     {
-        std::cerr << "Failed to open file for writing: " << path << std::endl;
+        InputManager::printDebug( std::string( "Failed to open file for writing: " ).append( path.string() ) );
         return false;
     }
 
     char buffer[1024];
     size_t bytesRead = 0;
-    while ( ( bytesRead = gpgme_data_read( ciphertext, buffer, sizeof(buffer) ) ) > 0 )
+    while ( ( bytesRead = gpgme_data_read( ciphertext, buffer, sizeof( buffer ) ) ) > 0 )
     {
         file.write( buffer, bytesRead );
     }
 
     if ( file.bad() )
     {
-        std::cerr << "Failed to write ciphertext to file: " << path << std::endl;
+        InputManager::printDebug( std::string( "Failed to write ciphertext to file: " ).append( path.string() ) );
         return false;
     }
 
     return true;
 }
- 
+
 void cleanup( gpgme_ctx_t ctx, gpgme_data_t plaintext, gpgme_data_t ciphertext )
 {
     gpgme_data_release( plaintext );
@@ -195,7 +200,7 @@ bool encryptDataToFile( const std::string& data, const std::filesystem::path& pa
     {
         return false;
     }
-    
+
     gpgme_data_t ciphertext = createEmptyDataObject();
     if ( ciphertext == nullptr )
     {
@@ -217,7 +222,7 @@ bool encryptDataToFile( const std::string& data, const std::filesystem::path& pa
     return true;
 }
 
-std::optional< std::string > decryptDataFromFile( const std::filesystem::path &path )
+std::optional< std::string > decryptDataFromFile( const std::filesystem::path& path )
 {
     if ( !initGpgme() )
     {
@@ -234,11 +239,11 @@ std::optional< std::string > decryptDataFromFile( const std::filesystem::path &p
     {
         return std::nullopt;
     }
-    
+
     gpgme_data_t ciphertext = createDataObject( path );
     if ( ciphertext == nullptr )
     {
-      return std::nullopt;
+        return std::nullopt;
     }
 
     gpgme_data_t plaintext = createEmptyDataObject();
@@ -251,20 +256,26 @@ std::optional< std::string > decryptDataFromFile( const std::filesystem::path &p
     {
         return std::nullopt;
     }
-    
-    gpgme_data_seek( plaintext, 0, SEEK_SET );
+
+    gpgme_error_t err = gpgme_data_seek( plaintext, 0, SEEK_SET );
+
+    if ( err )
+    {
+        InputManager::printDebug( std::string( "Failed to seek to beginning of plaintext: " ).append( gpgme_strerror( err ) ) );
+        return std::nullopt;
+    }
+
 
     char bufferDecrypted[1024];
     std::string decryptedData;
     ssize_t bytesRead;
 
-    while ((bytesRead = gpgme_data_read(plaintext, bufferDecrypted, sizeof(bufferDecrypted))) > 0)
+    while ( ( bytesRead = gpgme_data_read( plaintext, bufferDecrypted, sizeof( bufferDecrypted ) ) ) > 0 )
     {
-        decryptedData.append(bufferDecrypted, bytesRead);
+        decryptedData.append( bufferDecrypted, bytesRead );
     }
 
-
-    cleanup(ctx, plaintext, ciphertext);
+    cleanup( ctx, plaintext, ciphertext );
 
     return decryptedData;
 }

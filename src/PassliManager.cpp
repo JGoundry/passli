@@ -1,13 +1,12 @@
 #include "PassliManager.hpp"
+#include "InputManager.hpp"
 
 #include <fstream>
-#include <iostream>
 
-PassliManager::PassliManager(int argc, char *argv[]) :
-    vaultPath_( std::filesystem::path(std::getenv("HOME")) / ".passli" ),
-    settingsPath_( std::filesystem::path(std::getenv("HOME")) / ".passli" / "settings.conf" ),
-    inputManager_( argc, argv ),
-    vaultManager_( vaultPath_ )
+PassliManager::PassliManager( int argc, char* argv[] ) : vaultPath_( std::filesystem::path( std::getenv( "HOME" ) ) / ".passli" ),
+                                                         settingsPath_( std::filesystem::path( std::getenv( "HOME" ) ) / ".passli" / "settings.conf" ),
+                                                         inputManager_( argc, argv ),
+                                                         vaultManager_( vaultPath_ )
 {
 }
 
@@ -22,21 +21,21 @@ bool PassliManager::setup()
 
     if ( !initVault() )
     {
-        std::cerr << "Failed to initialize vault." << std::endl;
-        return false;
-    }   
-
-    if ( !initSettings() )
-    {
-        std::cerr << "Failed to initialize settings." << std::endl;
+        InputManager::printError( "Failed to initialize vault." );
         return false;
     }
 
-    if ( settings_.googleDrive ) 
+    if ( !initSettings() )
+    {
+        InputManager::printError( "Failed to initialize settings." );
+        return false;
+    }
+
+    if ( settings_.googleDrive )
     {
         if ( !initDrive() )
         {
-            std::cerr << "Failed to initialize google drive." << std::endl;
+            InputManager::printError( "Failed to initialize google drive." );
         }
     }
 
@@ -51,7 +50,7 @@ bool PassliManager::initVault()
     }
     else if ( !std::filesystem::is_directory( vaultPath_ ) )
     {
-        std::cerr << "Vault path is not a directory." << std::endl;
+        InputManager::printError( "Vault path is not a directory." );
         return false;
     }
 
@@ -80,14 +79,14 @@ bool PassliManager::initSettings()
 
 bool PassliManager::initDrive()
 {
-        // Connect to google drive
+    // Connect to google drive
 
     return true;
 }
 
 bool PassliManager::syncDrive()
 {
-        // Sync to google drive
+    // Sync to google drive
 
     return true;
 }
@@ -98,41 +97,41 @@ bool PassliManager::run()
 
     switch ( opts_.mode )
     {
-        case MODE::LIST:
+    case MODE::LIST:
+    {
+        const std::vector< std::string > passwordNames = vaultManager_.list();
+        inputManager_.displayPasswordNames( passwordNames );
+        result = true;
+        break;
+    }
+    case MODE::ADD:
+    {
+        result = vaultManager_.add( opts_.name.value(), opts_.username.value(), opts_.password.value() );
+        break;
+    }
+    case MODE::GET:
+    {
+        const std::optional< std::string > password = vaultManager_.get( opts_.name.value() );
+        if ( password )
         {
-            const std::vector< std::string > passwordNames = vaultManager_.list();
-            inputManager_.displayPasswordNames( passwordNames );
-            result = true;
-            break;
-        }
-        case MODE::ADD:
-        {
-            result = vaultManager_.add( opts_.name.value(), opts_.username.value(), opts_.password.value() );
-            break;
-        }
-        case MODE::GET:
-        {
-            const std::optional< std::string > password = vaultManager_.get( opts_.name.value() );
-            if ( password )
-            {
 
-                inputManager_.displayPassword( password.value() );
-                result = true;
-            }
-            break;
+            inputManager_.displayPassword( password.value() );
+            result = true;
         }
-        case MODE::DEL:
-        {
-            result = vaultManager_.del( opts_.name.value() );
-            break;
-        }
+        break;
+    }
+    case MODE::DEL:
+    {
+        result = vaultManager_.del( opts_.name.value() );
+        break;
+    }
     }
 
     if ( result && settings_.googleDrive )
     {
         if ( !syncDrive() )
         {
-            std::cerr << "Failed to sync to google drive." << std::endl;
+            InputManager::printError( "Failed to sync to google drive." );
         }
     }
 

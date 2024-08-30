@@ -1,17 +1,16 @@
 #include "InputManager.hpp"
 
 #include <algorithm>
-#include <iostream>
 #include <cstring>
+#include <iostream>
 
 std::string getUsageString()
 {
     return "Usage: passli [add|get|del] [name]";
 }
 
-InputManager::InputManager( int argc, char *argv[] ) :
-    argc_( argc ),
-    argv_( argv )
+InputManager::InputManager( int argc, char* argv[] ) : argc_( argc ),
+                                                       argv_( argv )
 {
 }
 
@@ -35,7 +34,6 @@ bool InputManager::validateArgs()
     {
         opts_.mode = MODE::GET;
         opts_.name = argv_[2];
-
     }
     else if ( argc_ > 2 && strcmp( argv_[1], "del" ) == 0 )
     {
@@ -55,7 +53,7 @@ bool InputManager::validateArgs()
 ProgramOptions InputManager::getOptions()
 {
     if ( opts_.mode == MODE::ADD )
-    { 
+    {
         opts_.username = getUsername();
         opts_.password = getPassword();
     }
@@ -83,22 +81,21 @@ std::string InputManager::getInput() const
     return input;
 }
 
-void InputManager::displayHelp() const
+void InputManager::displayHelp()
 {
     // todo
 }
 
-void InputManager::displayPassword( const std::string& password ) const
+void InputManager::displayPassword( const std::string& password )
 {
     std::cout << password << std::endl;
 }
 
-void InputManager::displayPasswordNames( const std::vector< std::string >& passwordNames ) const
+void InputManager::displayPasswordNames( const std::vector< std::string >& passwordNames )
 {
     unsigned long longestName = 0;
     for ( const std::string& name : passwordNames )
         longestName = std::max( longestName, name.size() );
-
 
     std::cout << " " << std::string( longestName + 6, '-' ) << std::endl;
     for ( const std::string& name : passwordNames )
@@ -108,4 +105,14 @@ void InputManager::displayPasswordNames( const std::vector< std::string >& passw
     }
     std::cout << " |--" << std::endl;
     std::cout << " " << std::string( longestName + 6, '-' ) << std::endl;
+}
+
+void InputManager::printDebug( const std::string& message )
+{
+    std::cout << message << std::endl;
+}
+
+void InputManager::printError( const std::string& message )
+{
+    std::cout << message <<std::endl;
 }

@@ -1,18 +1,17 @@
 #include "VaultManager.hpp"
+#include "InputManager.hpp"
 #include "crypt/cryptUtils.hpp"
 
 #include <cstdlib>
 #include <filesystem>
-#include <iostream>
 
-VaultManager::VaultManager( const std::filesystem::path& vaultPath ) :
-    vaultPath_( vaultPath )
+VaultManager::VaultManager( const std::filesystem::path& vaultPath ) : vaultPath_( vaultPath )
 {
 }
 
 std::vector< std::string > VaultManager::list() const
 {
-    std::vector<std::string> passwordNames;
+    std::vector< std::string > passwordNames;
     for ( const auto& entry : std::filesystem::directory_iterator( vaultPath_ ) )
     {
         if ( entry.path().extension() != ".gpg" )
@@ -39,7 +38,7 @@ std::optional< std::string > VaultManager::get( const std::string& name ) const
     const std::filesystem::path path( vaultPath_.string() + "/" + name + ".gpg" );
     if ( !std::filesystem::exists( path ) )
     {
-        std::cerr << "Password does not exist." << std::endl;
+        InputManager::printError( "Password does not exist." );
         return std::nullopt;
     }
 
@@ -51,7 +50,7 @@ bool VaultManager::del( const std::string& name ) const
     const std::filesystem::path path( vaultPath_.string() + "/" + name + ".gpg" );
     if ( !std::filesystem::exists( path ) )
     {
-        std::cerr << "Password does not exist." << std::endl;
+        InputManager::printError( "Password does not exist." );
         return false;
     }
 
