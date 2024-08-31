@@ -1,8 +1,6 @@
 #include "InputManager.hpp"
 #include "PassliManager.hpp"
 
-#include <iostream>
-
 int main( int argc, char* argv[] )
 {
     try
