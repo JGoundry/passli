@@ -1,5 +1,6 @@
 #pragma once
 
+#include <map>
 #include <optional>
 #include <string>
 
@@ -25,3 +26,17 @@ struct ProgramSettings
     /* EncryptionType encryptionType = EncryptionType::AES; */
     /* std::string drivePath; */
 };
+
+struct ServiceData
+{
+    std::string username;
+    std::string password;
+
+    bool operator==( const ServiceData& other ) const
+    {
+        return username == other.username &&
+               password == other.password;
+    }
+};
+
+using VaultMap = std::map< std::string, ServiceData >;

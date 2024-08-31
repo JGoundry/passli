@@ -86,9 +86,9 @@ void InputManager::displayHelp()
     // todo
 }
 
-void InputManager::displayPassword( const std::string& password )
+void InputManager::displayPassword( const ServiceData& data )
 {
-    std::cout << password << std::endl;
+    std::cout << data.username << " > " << data.password << std::endl;
 }
 
 void InputManager::displayPasswordNames( const std::vector< std::string >& passwordNames )

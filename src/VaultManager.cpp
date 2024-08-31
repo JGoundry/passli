@@ -7,54 +7,53 @@
 
 VaultManager::VaultManager( const std::filesystem::path& vaultPath ) : vaultPath_( vaultPath )
 {
+    // open vault
+    std::optional< std::string > jsonString = crypt::decryptDataFromFile( vaultPath_ );
+
+    if ( !jsonString )
+        return;
+
+    vaultMap_ = json::json2map( jsonString.value() );
 }
 
 std::vector< std::string > VaultManager::list() const
 {
     std::vector< std::string > passwordNames;
-    for ( const auto& entry : std::filesystem::directory_iterator( vaultPath_ ) )
+
+    for ( const auto& [name, data] : vaultMap_ )
     {
-        if ( entry.path().extension() != ".gpg" )
-        {
-            continue;
-        }
-        const std::string passwordName = entry.path().filename().string().substr( 0, entry.path().filename().string().find( ".gpg" ) );
-        passwordNames.emplace_back( entry.path().filename().string().substr( 0, entry.path().filename().string().find( ".gpg" ) ) );
+        passwordNames.push_back( name );
     }
 
     return passwordNames;
 }
 
-bool VaultManager::add( const std::string& name, const std::string& username, const std::string& password ) const
+bool VaultManager::add( const std::string& name, const std::string& username, const std::string& password )
 {
-    const std::string plaintext = name + "|" + username + "|" + password;
-    const std::filesystem::path path( vaultPath_.string() + "/" + name + ".gpg" );
-
-    return crypt::encryptDataToFile( plaintext, path );
+    vaultMap_[name] = { username, password };
+    return crypt::encryptDataToFile( json::map2json( vaultMap_ ), vaultPath_ );
 }
 
-std::optional< std::string > VaultManager::get( const std::string& name ) const
+std::optional< ServiceData > VaultManager::get( const std::string& name ) const
 {
-    const std::filesystem::path path( vaultPath_.string() + "/" + name + ".gpg" );
-    if ( !std::filesystem::exists( path ) )
+    if ( !vaultMap_.contains( name ) )
     {
         InputManager::printError( "Password does not exist." );
         return std::nullopt;
     }
 
-    return crypt::decryptDataFromFile( path );
+    return vaultMap_.at( name );
 }
 
-bool VaultManager::del( const std::string& name ) const
+bool VaultManager::del( const std::string& name )
 {
-    const std::filesystem::path path( vaultPath_.string() + "/" + name + ".gpg" );
-    if ( !std::filesystem::exists( path ) )
+    if ( !vaultMap_.contains( name ) )
     {
         InputManager::printError( "Password does not exist." );
         return false;
     }
 
-    std::filesystem::remove( path );
+    vaultMap_.erase( name );
 
     return true;
 }

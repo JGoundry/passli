@@ -2,6 +2,9 @@
 
 #include "gtest/gtest.h"
 
+namespace test
+{
+
 // Order is not preserved with nlohman::json as it uses a map.
 // This string is ordered accordingly.
 std::string jsonString =
@@ -16,7 +19,7 @@ std::string jsonString =
     "}"
     "}";
 
-std::map< std::string, ServiceData > vaultMap {
+VaultMap vaultMap {
     { "facebook", { "user", "pass" } },
     { "gmail", { "user", "pass" } }
 };
@@ -29,4 +32,6 @@ TEST( JsonUtils, Json2Map )
 TEST( JsonUtils, Map2Json )
 {
     EXPECT_EQ( jsonString, json::map2json( vaultMap ) );
+}
+
 }

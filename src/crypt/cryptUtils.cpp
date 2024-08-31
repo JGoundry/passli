@@ -5,8 +5,6 @@
 
 #include <fcntl.h>
 #include <fstream>
-#include <iostream>
-#include <optional>
 
 namespace crypt
 {
@@ -265,7 +263,6 @@ std::optional< std::string > decryptDataFromFile( const std::filesystem::path& p
         return std::nullopt;
     }
 
-
     char bufferDecrypted[1024];
     std::string decryptedData;
     ssize_t bytesRead;
@@ -280,4 +277,4 @@ std::optional< std::string > decryptDataFromFile( const std::filesystem::path& p
     return decryptedData;
 }
 
-} // namespace crypt
+} //namespace crypt

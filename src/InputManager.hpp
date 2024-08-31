@@ -16,7 +16,7 @@ public:
     bool validateArgs();
     ProgramOptions getOptions();
     static void displayHelp();
-    static void displayPassword( const std::string& password );
+    static void displayPassword( const ServiceData& password );
     static void displayPasswordNames( const std::vector< std::string >& passwordNames );
     static void printDebug( const std::string& message );
     static void printError( const std::string& message );

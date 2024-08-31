@@ -2,5 +2,5 @@
 
 - gtest
 - nlohmann/json
-- gpgme ( switch to openssl planned )
+- gpgme
 - libcurl ( planned )

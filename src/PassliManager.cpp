@@ -1,9 +1,11 @@
 #include "PassliManager.hpp"
 #include "InputManager.hpp"
+#include "crypt/cryptUtils.hpp"
 
+#include <filesystem>
 #include <fstream>
 
-PassliManager::PassliManager( int argc, char* argv[] ) : vaultPath_( std::filesystem::path( std::getenv( "HOME" ) ) / ".passli" ),
+PassliManager::PassliManager( int argc, char* argv[] ) : vaultPath_( std::filesystem::path( std::getenv( "HOME" ) ) / ".passli" / "vault" ),
                                                          settingsPath_( std::filesystem::path( std::getenv( "HOME" ) ) / ".passli" / "settings.conf" ),
                                                          inputManager_( argc, argv ),
                                                          vaultManager_( vaultPath_ )
@@ -46,9 +48,11 @@ bool PassliManager::initVault()
 {
     if ( !std::filesystem::exists( vaultPath_ ) )
     {
-        std::filesystem::create_directory( vaultPath_ );
+        std::filesystem::create_directories( vaultPath_.root_directory() );
+        VaultMap emptyMap;
+        return crypt::encryptDataToFile( json::map2json( emptyMap ), vaultPath_ );
     }
-    else if ( !std::filesystem::is_directory( vaultPath_ ) )
+    else if ( !std::filesystem::is_regular_file( vaultPath_ ) )
     {
         InputManager::printError( "Vault path is not a directory." );
         return false;
@@ -111,11 +115,10 @@ bool PassliManager::run()
     }
     case MODE::GET:
     {
-        const std::optional< std::string > password = vaultManager_.get( opts_.name.value() );
-        if ( password )
+        const std::optional< ServiceData > data = vaultManager_.get( opts_.name.value() );
+        if ( data )
         {
-
-            inputManager_.displayPassword( password.value() );
+            inputManager_.displayPassword( data.value() );
             result = true;
         }
         break;

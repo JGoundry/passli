@@ -5,11 +5,11 @@
 namespace json
 {
 
-std::string map2json( const std::map< std::string, ServiceData >& passwordMap )
+std::string map2json( const VaultMap& vaultMap )
 {
     nlohmann::json json;
 
-    for ( const auto& [serviceName, serviceData] : passwordMap )
+    for ( const auto& [serviceName, serviceData] : vaultMap )
     {
         json[serviceName] = { { "username", serviceData.username }, { "password", serviceData.password } };
     }
@@ -17,9 +17,9 @@ std::string map2json( const std::map< std::string, ServiceData >& passwordMap )
     return nlohmann::to_string( json );
 }
 
-std::map< std::string, ServiceData > json2map( const std::string& jsonString )
+VaultMap json2map( const std::string& jsonString )
 {
-    std::map< std::string, ServiceData > vaultMap;
+    VaultMap vaultMap;
 
     nlohmann::json json = nlohmann::json::parse( jsonString );
 
